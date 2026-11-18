@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body { @apply bg-slate-50 text-slate-800 antialiased; }
+  h1 { @apply text-2xl font-bold text-slate-900; }
+  h2 { @apply text-lg font-semibold text-slate-900; }
+}
+
+@layer components {
+  .card { @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60; }
+  .btn-primary { @apply btn bg-brand text-white hover:bg-brand-light; }
+  .btn-accent { @apply btn bg-brand-accent text-slate-900 hover:brightness-95; }
+  .btn-danger { @apply btn bg-red-600 text-white hover:bg-red-700; }
+  .btn-ghost { @apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-100; }
+  .btn-sm { @apply px-3 py-1.5 text-xs; }
+  .input { @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:bg-slate-100 disabled:text-slate-500; }
+  .label { @apply mb-1 block text-sm font-medium text-slate-700; }
+  .table-wrap { @apply overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm; }
+  .table { @apply w-full text-left text-sm; }
+  .table th { @apply whitespace-nowrap border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500; }
+  .table td { @apply border-b border-slate-100 px-4 py-3 align-top; }
+  .table tr:last-child td { @apply border-b-0; }
+  .badge { @apply inline-flex whitespace-nowrap items-center rounded-full px-2.5 py-0.5 text-xs font-semibold; }
+  .alert-error { @apply rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700; }
+  .alert-info { @apply rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800; }
+}
