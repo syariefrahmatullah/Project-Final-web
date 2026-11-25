@@ -24,7 +24,16 @@ export default async function RegisterPage() {
         ].map(([n, l, t]) => (
           <div key={n}>
             <label className="label" htmlFor={n}>{l}</label>
-            <input id={n} name={n} type={t} required className="input" />
+                        <input
+              id={n}
+              name={n}
+              type={t}
+              required
+              className="input"
+              {...(n === "phone"
+                ? { inputMode: "numeric", pattern: "[0-9]{8,15}", title: "Hanya angka, 8 sampai 15 digit" }
+                : {})}
+            />
           </div>
         ))}
         <div>

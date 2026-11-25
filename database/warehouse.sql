@@ -18,7 +18,7 @@ CREATE TABLE users (
   role           VARCHAR(20) NOT NULL
                  CHECK (role IN ('admin', 'manager', 'staff', 'supplier')),
   company        VARCHAR(160),
-  phone          VARCHAR(40),
+  phone          VARCHAR(40) CHECK (phone ~ '^[0-9]{8,15}$'),
   address        VARCHAR(1000),
   
   supplier_status VARCHAR(20)

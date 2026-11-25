@@ -20,5 +20,12 @@ export default function InputLimits() {
     obs.observe(document.body, { childList: true, subtree: true });
     return () => obs.disconnect();
   }, []);
+    useEffect(() => {
+    const onInput = (e) => {
+      if (e.target.name === "phone") e.target.value = e.target.value.replace(/\D/g, "");
+    };
+    document.addEventListener("input", onInput);
+    return () => document.removeEventListener("input", onInput);
+  }, []);
   return null;
 }

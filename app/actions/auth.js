@@ -35,6 +35,9 @@ export async function registerSupplierAction(_prev, fd) {
       throw new UserError("Semua kolom wajib diisi.");
     }
     if (!/^\S+@\S+\.\S+$/.test(email)) throw new UserError("Format email tidak valid.");
+        if (!/^[0-9]{8,15}$/.test(phone)) {
+      throw new UserError("No. telepon hanya boleh berisi angka (8 sampai 15 digit).");
+    }
     if (password.length < 6) throw new UserError("Password minimal 6 karakter.");
     const exists = await queryOne(`SELECT 1 FROM users WHERE email = $1`, [email]);
     if (exists) throw new UserError("Email sudah terdaftar.");
