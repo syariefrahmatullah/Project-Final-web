@@ -44,7 +44,8 @@ export default function ItemRows({ products, initial = [], showStock = false }) 
               min={1}
               max={showStock && p ? Math.max(p.stock, 1) : undefined}
               value={r.quantity}
-              onChange={(e) => update(r.key, { quantity: e.target.value })}
+              // Fix Bug #5: konversi ke Number agar validasi max berfungsi benar
+              onChange={(e) => update(r.key, { quantity: Number(e.target.value) })}
               className="input w-28"
               aria-label="Kuantitas"
             />

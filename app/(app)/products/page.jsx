@@ -12,9 +12,11 @@ export const metadata = { title: "Produk - gudangLPS" };
 export default async function ProductsPage({ searchParams }) {
   const user = await requireRole("admin", "manager", "staff");
   const canEdit = user.role === "admin" || user.role === "manager";
-  const q = (searchParams.q || "").trim();
-  const cat = searchParams.category || "";
-  const status = searchParams.status || "";
+  // Fix Bug #3: searchParams adalah Promise di Next.js 15, wajib await
+  const params = await searchParams;
+  const q = (params.q || "").trim();
+  const cat = params.category || "";
+  const status = params.status || "";
 
   const [categories, all] = await Promise.all([
     query(`SELECT id, name FROM categories ORDER BY name`),

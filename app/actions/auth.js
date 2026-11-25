@@ -52,6 +52,6 @@ export async function registerSupplierAction(_prev, fd) {
 }
 
 export async function logoutAction() {
-  destroySession();
+  await destroySession();
   redirect("/login");
 }

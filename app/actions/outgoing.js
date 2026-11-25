@@ -107,18 +107,43 @@ export async function deleteOutgoingAction(_prev, fd) {
   redirect("/outgoing");
 }
 
-/* 2. Manager: Approved (stok belum berkurang) */
+/* 2. Manager: Approved - stok divalidasi ulang di dalam transaksi */
 export async function approveOutgoingAction(_prev, fd) {
   return guarded(async () => {
     const user = await assertRole("manager");
     const id = int(fd, "id");
-    const trx = await queryOne(`SELECT status FROM outgoing_transactions WHERE id = $1`, [id]);
-    if (!trx) throw new UserError("Transaksi tidak ditemukan.");
-    if (trx.status !== "pending") throw new UserError("Hanya transaksi Pending yang dapat disetujui.");
-    await query(
-      `UPDATE outgoing_transactions SET status='approved', reviewed_by=$1 WHERE id=$2`,
-      [user.id, id]
-    );
+    // Fix Bug #4: Gunakan withTransaction + FOR UPDATE untuk cegah race condition.
+    // Dua Manager tidak bisa approve outgoing produk yang sama secara bersamaan.
+    await withTransaction(async (c) => {
+      const { rows } = await c.query(
+        `SELECT * FROM outgoing_transactions WHERE id = $1 FOR UPDATE`,
+        [id]
+      );
+      const trx = rows[0];
+      if (!trx) throw new UserError("Transaksi tidak ditemukan.");
+      if (trx.status !== "pending") throw new UserError("Hanya transaksi Pending yang dapat disetujui.");
+      // Validasi stok ulang di dalam transaksi (stok bisa berubah sejak pengajuan)
+      const items = (await c.query(
+        `SELECT product_id, quantity FROM outgoing_items WHERE outgoing_id = $1`,
+        [id]
+      )).rows;
+      for (const it of items) {
+        const p = (await c.query(
+          `SELECT name, stock FROM products WHERE id = $1 FOR UPDATE`,
+          [it.product_id]
+        )).rows[0];
+        if (!p) throw new UserError("Produk tidak ditemukan.");
+        if (it.quantity > p.stock) {
+          throw new UserError(
+            `Stok "${p.name}" tidak mencukupi (tersedia ${p.stock}, dibutuhkan ${it.quantity}). Transaksi tidak dapat disetujui.`
+          );
+        }
+      }
+      await c.query(
+        `UPDATE outgoing_transactions SET status='approved', reviewed_by=$1 WHERE id=$2`,
+        [user.id, id]
+      );
+    });
     revalidatePath("/", "layout");
     return { ok: true };
   });

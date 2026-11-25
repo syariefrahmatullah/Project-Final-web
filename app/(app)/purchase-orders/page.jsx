@@ -11,7 +11,9 @@ const STATUSES = ["pending", "confirmed", "rejected", "in_transit", "inspecting"
 
 export default async function POList({ searchParams }) {
   const user = await requireRole();
-  const status = STATUSES.includes(searchParams.status) ? searchParams.status : "";
+  // Fix Bug #3: searchParams adalah Promise di Next.js 15, wajib await
+  const sp = await searchParams;
+  const status = STATUSES.includes(sp.status) ? sp.status : "";
   const params = [status];
   let where = `($1 = '' OR po.status = $1)`;
   if (user.role === "supplier") {
