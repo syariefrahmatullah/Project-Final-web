@@ -19,11 +19,11 @@ CREATE TABLE users (
                  CHECK (role IN ('admin', 'manager', 'staff', 'supplier')),
   company        VARCHAR(160),
   phone          VARCHAR(40),
-  address        TEXT,
-  -- khusus supplier: pending -> approved / rejected (diputuskan Admin)
+  address        TEXT VARCHAR(1000),
+  
   supplier_status VARCHAR(20)
                  CHECK (supplier_status IN ('pending', 'approved', 'rejected')),
-  reject_reason  TEXT,
+  reject_reason  TEXT VARCHAR(1000),
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -43,7 +43,7 @@ CREATE TABLE products (
   stock        INT NOT NULL DEFAULT 0 CHECK (stock >= 0),
   min_stock    INT NOT NULL DEFAULT 0 CHECK (min_stock >= 0),
   low_stock    INT NOT NULL DEFAULT 0,
-  description  TEXT,
+  description  TEXT VARCHAR(1000),
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   -- Stok Low harus lebih besar dari Stok Minimum
   CONSTRAINT low_gt_min CHECK (low_stock > min_stock)
@@ -57,14 +57,14 @@ CREATE TABLE purchase_orders (
   supplier_id     INT NOT NULL REFERENCES users(id),
   order_date      DATE NOT NULL DEFAULT CURRENT_DATE,
   expected_date   DATE NOT NULL,
-  notes           TEXT,
+  notes           TEXT VARCHAR(1000),
   status          VARCHAR(20) NOT NULL DEFAULT 'pending'
                   CHECK (status IN ('pending', 'confirmed', 'rejected',
                                     'in_transit', 'inspecting',
                                     'received', 'returned')),
-  reason          TEXT,          -- alasan Rejected (Supplier) / Returned (Manager)
+  reason          TEXT VARCHAR(1000),          -- alasan Rejected (Supplier) / Returned (Manager)
   proof_photo     VARCHAR(200),  -- foto bukti kedatangan (diunggah Supplier)
-  refund_claim    TEXT,          -- klaim refund jika barang ditolak
+  refund_claim    TEXT VARCHAR(1000),          -- klaim refund jika barang ditolak
   refund_claimed_at TIMESTAMPTZ,
   created_by      INT NOT NULL REFERENCES users(id),
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -83,7 +83,7 @@ CREATE TABLE inspection_reports (
   po_id       INT NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
   staff_id    INT NOT NULL REFERENCES users(id),
   is_match    BOOLEAN NOT NULL,   -- true: jumlah & kondisi sesuai
-  notes       TEXT NOT NULL,
+  notes       TEXT VARCHAR(1000) NOT NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -95,8 +95,8 @@ CREATE TABLE incoming_transactions (
   receive_date  DATE NOT NULL DEFAULT CURRENT_DATE,
   status        VARCHAR(20) NOT NULL DEFAULT 'pending'
                 CHECK (status IN ('pending', 'approved', 'rejected')),
-  reason        TEXT,           -- wajib jika Rejected
-  notes         TEXT,
+  reason        TEXT VARCHAR(1000),           -- wajib jika Rejected
+  notes         TEXT VARCHAR(1000),
   created_by    INT NOT NULL REFERENCES users(id),
   reviewed_by   INT REFERENCES users(id),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -113,10 +113,10 @@ CREATE TABLE outgoing_transactions (
   trx_number  VARCHAR(30) NOT NULL UNIQUE,
   ship_date   DATE NOT NULL,
   customer    VARCHAR(160) NOT NULL,
-  notes       TEXT,
+  notes       TEXT VARCHAR(1000),
   status      VARCHAR(20) NOT NULL DEFAULT 'pending'
               CHECK (status IN ('pending', 'approved', 'rejected', 'shipped')),
-  reason      TEXT,             -- wajib jika Rejected
+  reason      TEXT VARCHAR(1000),             -- wajib jika Rejected
   created_by  INT NOT NULL REFERENCES users(id),
   reviewed_by INT REFERENCES users(id),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()

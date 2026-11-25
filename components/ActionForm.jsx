@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useFormState } from "react-dom";
+
 
 // Form generik untuk server action bertanda tangan (prevState, formData).
 // Menampilkan pesan error dari action dan meminta konfirmasi jika `confirmText` diisi.
 export default function ActionForm({ action, children, className = "", confirmText }) {
-  const [state, formAction] = useActionState(action, null);
+  const [state, formAction] = useFormState(action, null);
   return (
     <form
       action={formAction}
